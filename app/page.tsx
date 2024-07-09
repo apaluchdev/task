@@ -30,7 +30,7 @@ async function Tasks(): Promise<JSX.Element> {
         <div className="flex items-center gap-2" key={task.id}>
           <Checkbox id={task.id + ""} />
           <Label htmlFor={task.id + ""}>
-            {task.title} - {task.description}
+            {task.title} {task.description ? "-" + task.description : ""}
           </Label>
         </div>
       ))}
