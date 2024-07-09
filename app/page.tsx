@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { db } from "@/server/db";
 import { sql } from "@vercel/postgres";
 import Image from "next/image";
 
@@ -13,24 +14,24 @@ export default function Home() {
         <div>
           <h2 className="scroll-m-20 text-1xl font-bold tracking-tight lg:text-2xl pb-4 pt-4">Priority</h2>
 
-          <div className="ml-4 flex items-center space-x-2">
-            <Checkbox id="terms" />
-            <Label htmlFor="terms">Accept terms and conditions</Label>
-          </div>
+          <Tasks />
         </div>
       </div>
     </main>
   );
 }
 
-async function Cart({ params }: { params: { user: string } }): Promise<JSX.Element> {
-  const { rows } = await sql`SELECT * from CARTS where user_id=${params.user}`;
+async function Tasks(): Promise<JSX.Element> {
+  const tasks = await db.query.tasks.findMany();
 
   return (
-    <div>
-      {rows.map((row) => (
-        <div key={row.id}>
-          {row.id} - {row.quantity}
+    <div className="ml-4 flex items-left flex-col gap-6">
+      {tasks.map((task) => (
+        <div className="flex items-center gap-2" key={task.id}>
+          <Checkbox id={task.id + ""} />
+          <Label htmlFor={task.id + ""}>
+            {task.title} - {task.description}
+          </Label>
         </div>
       ))}
     </div>
