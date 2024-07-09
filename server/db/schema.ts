@@ -2,7 +2,7 @@
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
 import { sql } from "drizzle-orm";
-import { index, pgTableCreator, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, pgTableCreator, serial, timestamp, varchar } from "drizzle-orm/pg-core";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -19,6 +19,7 @@ export const tasks = createTable(
     title: varchar("title", { length: 256 }).notNull(),
     description: varchar("description", { length: 256 }).notNull(),
     userId: varchar("userId", { length: 256 }).notNull(),
+    completed: boolean("completed").default(false).notNull(),
 
     createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)

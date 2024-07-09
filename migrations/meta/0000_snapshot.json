@@ -1,11 +1,11 @@
 {
-  "id": "52fea181-7845-4256-bb6d-034292adc7a8",
+  "id": "5eb83c27-7fd9-4d0d-b2e3-ef12e51b4977",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.tsk_image": {
-      "name": "tsk_image",
+    "public.tsk_task": {
+      "name": "tsk_task",
       "schema": "",
       "columns": {
         "id": {
@@ -14,15 +14,15 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "title": {
+          "name": "title",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
-        "url": {
-          "name": "url",
-          "type": "varchar(1024)",
+        "description": {
+          "name": "description",
+          "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
@@ -31,6 +31,13 @@
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
+        },
+        "completed": {
+          "name": "completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -53,11 +60,11 @@
         }
       },
       "indexes": {
-        "name_idx": {
-          "name": "name_idx",
+        "title_idx": {
+          "name": "title_idx",
           "columns": [
             {
-              "expression": "name",
+              "expression": "title",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
