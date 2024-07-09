@@ -12,12 +12,12 @@ export const metadata: Metadata = {
 
 function NavBar() {
   return (
-    <nav className="flex justify-between items-center p-4 bg-gray-900 text-white hover:text-slate-300 transition-colors">
-      <Link href="/" className="text-2xl font-bold">
+    <nav className="flex justify-between items-center p-4 bg-gray-900 text-white  transition-colors">
+      <Link href="/" className="text-2xl font-bold  hover:text-slate-300">
         Task
       </Link>
       <div>
-        <Link href="/login" className="mr-4">
+        <Link href="/login" className="mr-4 hover:text-slate-300">
           Login
         </Link>
       </div>

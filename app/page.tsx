@@ -13,7 +13,6 @@ export default function Home() {
         </div>
         <div>
           <h2 className="scroll-m-20 text-1xl font-bold tracking-tight lg:text-2xl pb-4 pt-4">Priority</h2>
-
           <Tasks />
         </div>
       </div>
@@ -27,10 +26,11 @@ async function Tasks(): Promise<JSX.Element> {
   return (
     <div className="ml-4 flex items-left flex-col gap-6">
       {tasks.map((task) => (
-        <div className="flex items-center gap-2" key={task.id}>
-          <Checkbox id={task.id + ""} />
-          <Label htmlFor={task.id + ""}>
-            {task.title} {task.description ? "-" + task.description : ""}
+        <div className="flex items-center gap-4 tracking-tight" key={task.id}>
+          {/* TODO On check, switch text to gray */}
+          <Checkbox className="scale-125" id={task.id + ""} />
+          <Label className="text-xl tracking-tight" htmlFor={task.id + ""}>
+            {task.title} {task.description ? " - " + task.description : ""}
           </Label>
         </div>
       ))}
