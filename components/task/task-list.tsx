@@ -19,8 +19,6 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
       return;
     }
 
-    await updateTask(task.id, { ...task, completed: !task.completed });
-
     toast({
       title: "Task Updated",
       variant: "default",
@@ -29,6 +27,8 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
     task.completed = !task.completed;
     const updatedTasks: SelectTask[] = [...tasks];
     setTasks(updatedTasks.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)).sort((a, b) => (a.completed ? 1 : -1)));
+
+    await updateTask(task.id, { ...task, completed: !task.completed });
   }
 
   // TODO - Try adding ability to drag tasks around to rearrange them
