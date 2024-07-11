@@ -11,9 +11,11 @@ import { insertTask } from "@/db/queries";
 import { useRouter } from "next/navigation";
 const { v4: uuidv4 } = require("uuid");
 
-export function AddTaskForm() {
-  const router = useRouter();
+interface Props {
+  onSubmitted: () => void;
+}
 
+const AddTaskForm: React.FC<Props> = ({ onSubmitted }) => {
   const formSchema = z.object({
     title: z.string().min(1).max(256),
     description: z.string().min(0).max(256),
@@ -36,10 +38,9 @@ export function AddTaskForm() {
 
     toast({
       title: "Task Submitted",
-      description: <div>The task</div>,
     });
 
-    router.refresh();
+    onSubmitted();
   }
 
   return (
@@ -71,10 +72,12 @@ export function AddTaskForm() {
             </FormItem>
           )}
         />
-        <Button className="self-start" type="submit">
+        <Button variant="default" className="self-start" type="submit">
           Submit
         </Button>
       </form>
     </Form>
   );
-}
+};
+
+export default AddTaskForm;

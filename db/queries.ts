@@ -10,7 +10,7 @@ export async function insertTask(data: InsertTask) {
 }
 
 // Read
-export async function getTasks() {
+export async function getTasks(): Promise<SelectTask[]> {
   return await db.select().from(tasks);
 }
 
