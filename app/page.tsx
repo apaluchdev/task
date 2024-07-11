@@ -1,7 +1,7 @@
 import TaskList from "@/components/task/task-list";
 import { db } from "@/db";
 
-export const dynamic = "force-dynamic";
+//export const dynamic = "force-dynamic";
 
 export default async function Home() {
   return (

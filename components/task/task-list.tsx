@@ -31,10 +31,11 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
     });
 
     task.completed = !task.completed;
+
     const updatedTasks: SelectTask[] = [...tasks];
     setTasks(updatedTasks.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)).sort((a, b) => (a.completed ? 1 : -1)));
 
-    await updateTask(task.id, { ...task, completed: !task.completed });
+    await updateTask(task.id, { ...task, completed: task.completed });
   }
 
   async function onDelete(taskId: number) {
