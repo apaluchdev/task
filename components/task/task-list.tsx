@@ -15,7 +15,7 @@ interface Props {
 }
 
 const TaskList: React.FC<Props> = ({ tasksProp }) => {
-  const [tasks, setTasks] = useState<SelectTask[]>(tasksProp.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)));
+  const [tasks, setTasks] = useState<SelectTask[]>(tasksProp.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1)));
   const [addTaskDialogOpen, setAddTaskDialogOpen] = React.useState(false);
 
   async function onCheckChange(id: number) {
