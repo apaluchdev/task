@@ -19,7 +19,9 @@ export const tasks = createTable(
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 256 }).notNull(),
     description: varchar("description", { length: 256 }).notNull(),
-    userId: varchar("userId", { length: 256 }).notNull(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     completed: boolean("completed").default(false).notNull(),
 
     createdAt: timestamp("created_at")

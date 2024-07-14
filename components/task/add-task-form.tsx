@@ -8,14 +8,14 @@ import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessa
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
 import { insertTask } from "@/db/queries";
-import { useRouter } from "next/navigation";
-const { v4: uuidv4 } = require("uuid");
+import { useSession } from "next-auth/react";
 
 interface Props {
   onSubmitted: () => void;
 }
 
 const AddTaskForm: React.FC<Props> = ({ onSubmitted }) => {
+  const { data: session } = useSession();
   const formSchema = z.object({
     title: z.string().min(1).max(256),
     description: z.string().min(0).max(256),
@@ -33,7 +33,7 @@ const AddTaskForm: React.FC<Props> = ({ onSubmitted }) => {
     await insertTask({
       title: values.title,
       description: values.description,
-      userId: uuidv4(),
+      userId: session?.user.id as string,
     });
 
     toast({

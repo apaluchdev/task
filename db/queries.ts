@@ -14,6 +14,11 @@ export async function getTasks(): Promise<SelectTask[]> {
   return await db.select().from(tasks);
 }
 
+// Read
+export async function getTasksByUserId(userId: SelectTask["userId"]): Promise<SelectTask[]> {
+  return await db.select().from(tasks).where(eq(tasks.userId, userId));
+}
+
 // Update
 export async function updateTask(id: SelectTask["id"], data: Partial<Omit<SelectTask, "id">>) {
   data.updatedAt = new Date();

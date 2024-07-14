@@ -8,7 +8,7 @@ import Credentials from "next-auth/providers/credentials";
 
 const handler = NextAuth({
   session: {
-    strategy: "database", // Explicit strategy required for Credentials provider
+    strategy: "jwt", // Explicit strategy required for Credentials provider
   },
   adapter: DrizzleAdapter(db) as Adapter,
   providers: [
