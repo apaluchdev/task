@@ -1,16 +1,24 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
 import { Adapter } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
 
 const handler = NextAuth({
+  session: {
+    strategy: "database", // Explicit strategy required for Credentials provider
+  },
   adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
     Credentials({
       // The name to display on the sign in form (e.g. "Sign in with...")
@@ -25,7 +33,7 @@ const handler = NextAuth({
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-        const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
+        const user = { id: "1", name: "J Smith", email: "jsmith@example.com", image: "" };
 
         if (user) {
           // Any object returned will be saved in `user` property of the JWT
@@ -40,14 +48,29 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    session({ session, token, user }) {
+    async session({ session, token, user }) {
+      if (user) {
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            id: user.id,
+          },
+        };
+      }
+
+      // User is not available TODO DELETE ME
       return {
         ...session,
         user: {
           ...session.user,
-          id: user.id,
         },
       };
+    },
+    async signIn({ user, account, profile, email, credentials }) {
+      if (account?.provider === "google") {
+      }
+      return true; // Do different verification for other providers that don't have `email_verified`
     },
   },
 });
