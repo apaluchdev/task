@@ -1,13 +1,13 @@
 import TaskList from "@/components/task/task-list";
-import { db } from "@/db";
 import { getTasksByUserId } from "@/db/queries";
 import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const session = await getServerSession();
-  
+  const session = await getServerSession(authOptions);
+
   if (!session?.user.id) {
     return <h1 className="text-4xl font-bold text-center mt-24">Please sign in</h1>;
   }

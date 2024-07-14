@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { Adapter } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt", // Explicit strategy required for Credentials provider
   },
@@ -58,6 +58,8 @@ const handler = NextAuth({
       return token;
     },
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
