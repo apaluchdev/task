@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await getServerSession();
-
-  if (!session) {
+  
+  if (!session?.user.id) {
     return <h1 className="text-4xl font-bold text-center mt-24">Please sign in</h1>;
   }
 

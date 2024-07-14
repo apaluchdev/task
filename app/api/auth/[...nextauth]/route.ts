@@ -46,6 +46,12 @@ const handler = NextAuth({
       }
       return true; // Do different verification for other providers that don't have `email_verified`
     },
+    async jwt({ user, token }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
   },
 });
 
