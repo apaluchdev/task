@@ -11,6 +11,7 @@ const handler = NextAuth({
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
     }),
+
     // Credentials({
     //   credentials: {
     //     username: { label: "Username" },
@@ -23,6 +24,19 @@ const handler = NextAuth({
     //   },
     // }),
   ],
+  callbacks: {
+    session({ session, token, user }) {
+      // `session.user.id` is now a valid property, and will be type-checked
+      // in places like `useSession().data.user` or `auth().user`
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          address: user.id,
+        },
+      };
+    },
+  },
 });
 
 export { handler as GET, handler as POST };
