@@ -1,7 +1,7 @@
 import TaskList from "@/components/task/task-list";
 import { getTasksByUserId } from "@/db/queries";
+import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
 
 export const dynamic = "force-dynamic";
 
