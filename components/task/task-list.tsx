@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import Task from "./task";
 import { SelectTask } from "@/db/schema";
-import { deleteTask, getTasks, updateTask } from "@/db/queries";
+import { deleteTask, getTasks, getTasksByUserId, updateTask } from "@/db/queries";
 import { toast } from "../ui/use-toast";
 import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import AddTaskForm from "./add-task-form";
+import { useSession } from "next-auth/react";
 
 interface Props {
   tasksProp: SelectTask[];
@@ -17,6 +18,7 @@ interface Props {
 const TaskList: React.FC<Props> = ({ tasksProp }) => {
   const [tasks, setTasks] = useState<SelectTask[]>(tasksProp.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1)));
   const [addTaskDialogOpen, setAddTaskDialogOpen] = React.useState(false);
+  const { data: session } = useSession();
 
   async function onCheckChange(id: number) {
     let task = tasks.find((task) => task.id === id);
@@ -52,7 +54,7 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
   async function onAddTask() {
     setAddTaskDialogOpen(false);
     // TODO - Add a loading state
-    setTasks(await getTasks());
+    setTasks(await getTasksByUserId(session?.user.id as string));
   }
 
   const AddTaskDialog = () => {
