@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Task from "./task";
 import { SelectTask } from "@/db/schema";
 import { deleteTask, getTasks, getTasksByUserId, updateTask } from "@/db/queries";
@@ -13,12 +13,19 @@ import { useSession } from "next-auth/react";
 
 interface Props {
   tasksProp: SelectTask[];
+  useSampleTasks: boolean;
 }
 
-const TaskList: React.FC<Props> = ({ tasksProp }) => {
-  const [tasks, setTasks] = useState<SelectTask[]>(tasksProp.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1)));
-  const [addTaskDialogOpen, setAddTaskDialogOpen] = React.useState(false);
+const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
   const { data: session } = useSession();
+
+  // If the user is not signed in, show sample tasks
+  const initialTasks = useSampleTasks
+    ? GetSampleTasks()
+    : tasksProp.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1));
+
+  const [tasks, setTasks] = useState<SelectTask[]>(initialTasks);
+  const [addTaskDialogOpen, setAddTaskDialogOpen] = React.useState(false);
 
   async function onCheckChange(id: number) {
     let task = tasks.find((task) => task.id === id);
@@ -61,7 +68,9 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
     return (
       <Dialog open={addTaskDialogOpen} onOpenChange={setAddTaskDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="default">Add Task</Button>
+          <Button disabled={!session?.user?.id} variant="default">
+            Add Task
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -74,6 +83,17 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
     );
   };
 
+  // If no tasks are found, show a message and the add task dialog
+  if (tasks.length < 1)
+    return (
+      <div className="flex gap-4 flex-col items-left">
+        <h1>No tasks yet!</h1>
+        <div>
+          <AddTaskDialog />
+        </div>
+      </div>
+    );
+
   // TODO - Try adding ability to drag tasks around to rearrange them
   // TODO - Add loading state
   return (
@@ -83,7 +103,7 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
           <div key={task.id} className="border-b pb-2 flex gap-4">
             <Task task={task} onToggle={onCheckChange} />
             <Button
-              className=" hover:text-red-600 hover:bg-transparent hover:opacity-80 opacity-5"
+              className={`hover:text-red-600 hover:bg-transparent hover:opacity-60 opacity-5`}
               size="icon"
               variant="ghost"
               onClick={() => onDelete(task.id)}
@@ -96,6 +116,33 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
       <AddTaskDialog />
     </div>
   );
+};
+
+const GetSampleTasks = () => {
+  console.log("Got sample tasks");
+  const date = new Date(1996, 0, 1);
+  return [
+    {
+      id: 1,
+      title: "Welcome to tasks",
+      description: "",
+      userId: "",
+      completed: false,
+      createdAt: date,
+      updatedAt: date,
+      deadline: date,
+    },
+    {
+      id: 2,
+      title: "Please sign in to save and track tasks",
+      description: "Have a good day! 😊",
+      userId: "",
+      completed: false,
+      createdAt: date,
+      updatedAt: date,
+      deadline: date,
+    },
+  ];
 };
 
 export default TaskList;
