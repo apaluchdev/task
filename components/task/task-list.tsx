@@ -119,7 +119,6 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
 };
 
 const GetSampleTasks = () => {
-  console.log("Got sample tasks");
   const date = new Date(1996, 0, 1);
   return [
     {

@@ -30,27 +30,12 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, token, user }) {
-      if (user) {
-        if (token) {
-          token.id = user.id;
-        }
-
-        return {
-          ...session,
-          user: {
-            ...session.user,
-            id: user.id,
-          },
-        };
-      }
-
-      // User is not available TODO DELETE ME
+    async session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.id,
+          id: token.id, // Getting the user id available into the session: Database id into the JWT, then into session from the JWT
         },
       };
     },
