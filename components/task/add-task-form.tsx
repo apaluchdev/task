@@ -34,6 +34,7 @@ const AddTaskForm: React.FC<Props> = ({ onSubmitted }) => {
       title: values.title,
       description: values.description,
       userId: session?.user.id as string,
+      completed: false,
     });
 
     toast({

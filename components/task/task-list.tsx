@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Task from "./task";
-import { SelectTask } from "@/db/schema";
-import { deleteTask, getTasks, getTasksByUserId, updateTask } from "@/db/queries";
+import React, { useState } from "react";
+import { deleteTask, getTasksByUserId, updateTask } from "@/db/queries";
 import { toast } from "../ui/use-toast";
 import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import AddTaskForm from "./add-task-form";
 import { useSession } from "next-auth/react";
+import { Task } from "@/types/task";
+import TaskCheckbox from "./task";
 
 interface Props {
-  tasksProp: SelectTask[];
+  tasksProp: Task[];
   useSampleTasks: boolean;
 }
 
@@ -22,9 +22,9 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
   // If the user is not signed in, show sample tasks
   const initialTasks = useSampleTasks
     ? GetSampleTasks()
-    : tasksProp.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1));
+    : tasksProp.sort((a, b) => ((a.createdAt ?? new Date()) > (b.createdAt ?? new Date()) ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1));
 
-  const [tasks, setTasks] = useState<SelectTask[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [addTaskDialogOpen, setAddTaskDialogOpen] = React.useState(false);
 
   async function onCheckChange(id: number) {
@@ -41,8 +41,10 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
 
     task.completed = !task.completed;
 
-    const updatedTasks: SelectTask[] = [...tasks];
-    setTasks(updatedTasks.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)).sort((a, b) => (a.completed ? 1 : -1)));
+    const updatedTasks: Task[] = [...tasks];
+    setTasks(sortTasks(updatedTasks));
+
+    if (!task.id) return;
 
     await updateTask(task.id, { ...task, completed: task.completed });
   }
@@ -62,6 +64,10 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
     setAddTaskDialogOpen(false);
     // TODO - Add a loading state
     setTasks(await getTasksByUserId(session?.user.id as string));
+  }
+
+  function sortTasks(tasks: Task[]) {
+    return tasks.sort((a, b) => ((a.createdAt ?? new Date()) > (b.createdAt ?? new Date()) ? 1 : -1)).sort((a, b) => (a.completed ? 1 : -1));
   }
 
   const AddTaskDialog = () => {
@@ -101,12 +107,12 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
       <div className="ml-4 flex items-left flex-col gap-2 pb-8">
         {tasks.map((task) => (
           <div key={task.id} className="border-b pb-2 flex gap-4">
-            <Task task={task} onToggle={onCheckChange} />
+            <TaskCheckbox task={task} onToggle={onCheckChange} />
             <Button
               className={`hover:text-red-600 hover:bg-transparent hover:opacity-60 opacity-5`}
               size="icon"
               variant="ghost"
-              onClick={() => onDelete(task.id)}
+              onClick={() => onDelete(task.id ?? -1)}
             >
               <Trash />
             </Button>
