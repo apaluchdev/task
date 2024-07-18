@@ -3,8 +3,8 @@ import { getServerSession } from "next-auth";
 import redis from "./redis";
 import { authOptions } from "./auth";
 
-const RATE_LIMIT_WINDOW_SECONDS = 60; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 5; // Max 5 requests per window
+const RATE_LIMIT_WINDOW_SECONDS = 30; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 10; // Max 5 requests per window
 
 export async function rateLimit(userId: string): Promise<boolean> {
   const key = `rate_limit:${userId}`;
