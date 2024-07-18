@@ -30,18 +30,25 @@ const AddTaskForm: React.FC<Props> = ({ onSubmitted }) => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await insertTask({
-      title: values.title,
-      description: values.description,
-      userId: session?.user.id as string,
-      completed: false,
-    });
+    try {
+      await insertTask({
+        title: values.title,
+        description: values.description,
+        userId: session?.user.id as string,
+        completed: false,
+      });
 
-    toast({
-      title: "Task Submitted",
-    });
+      toast({
+        title: "Task Submitted",
+      });
 
-    onSubmitted();
+      onSubmitted();
+    } catch (error) {
+      toast({
+        title: "An error occurred",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
