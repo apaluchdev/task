@@ -29,6 +29,7 @@ export const tasks = createTable(
       .notNull(),
     updatedAt: timestamp("updatedAt"),
     deadline: timestamp("deadline"),
+    //category: varchar("description", { length: 256 }).notNull(),
   },
   (example) => ({
     titleIndex: index("title_idx").on(example.title),
