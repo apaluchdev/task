@@ -15,6 +15,7 @@ import { SortByDropdown } from "./sort-by-dropdown";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { DeleteTaskAlert } from "./delete-task-alert";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface Props {
   tasksProp: Task[];
@@ -124,6 +125,7 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
           <DialogHeader>
             <DialogTitle>{selectedTask ? "Add Task" : "Edit Task"}</DialogTitle>
           </DialogHeader>
+          <DialogDescription></DialogDescription>
           <AddTaskForm task={selectedTask} onSubmitted={refreshTasks} />
         </DialogContent>
       </Dialog>
