@@ -1,15 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
-import { deleteTask, getTasksByUserId, updateTask } from "@/db/queries";
+import React, { useEffect, useState } from "react";
+import { deleteTask, deleteTasks, getTasksByUserId, updateTask } from "@/db/queries";
 import { toast } from "../ui/use-toast";
 import { Button } from "../ui/button";
-import { Trash } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Pencil, Trash } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import AddTaskForm from "./add-task-form";
 import { useSession } from "next-auth/react";
-import { Task } from "@/types/task";
+import { getSampleTasks, sortTasksByProperty, Task } from "@/types/task";
 import TaskCheckbox from "./task";
+import { ScrollArea } from "../ui/scroll-area";
+import { SortByDropdown } from "./sort-by-dropdown";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { DeleteTaskAlert } from "./delete-task-alert";
 
 interface Props {
   tasksProp: Task[];
@@ -20,12 +25,18 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
   const { data: session } = useSession();
 
   // If the user is not signed in, show sample tasks
-  const initialTasks = useSampleTasks
-    ? GetSampleTasks()
-    : tasksProp.sort((a, b) => ((a.createdAt ?? new Date()) > (b.createdAt ?? new Date()) ? -1 : 1)).sort((a, b) => (a.completed ? 1 : -1));
+  const initialTasks = useSampleTasks ? getSampleTasks() : tasksProp;
 
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [addTaskDialogOpen, setAddTaskDialogOpen] = React.useState(false);
+  const [isPrivate, setIsPrivate] = useState(true);
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
+  const [sort, setSort] = useState<{ key: string; direction: "Ascending" | "Descending" }>({ key: "Date Created", direction: "Ascending" });
+  const [addEditTaskDialogOpen, setAddEditTaskDialogOpen] = React.useState(false);
+
+  useEffect(() => {
+    sortTasks(tasks);
+    setTasks([...tasks]);
+  }, [sort]);
 
   async function onCheckChange(id: number) {
     let task = tasks.find((task) => task.id === id);
@@ -41,8 +52,8 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
 
     task.completed = !task.completed;
 
-    const updatedTasks: Task[] = [...tasks];
-    setTasks(sortTasks(updatedTasks));
+    sortTasks(tasks);
+    setTasks([...tasks]);
 
     if (!task.id) return;
 
@@ -60,30 +71,60 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
     setTasks(updatedTasks);
   }
 
-  async function onAddTask() {
-    setAddTaskDialogOpen(false);
+  async function onDeleteCompleted() {
+    const taskIds = tasks.filter((task) => task.completed).map((task) => task.id ?? -1);
+    await deleteTasks(taskIds);
+    toast({
+      title: "Completed tasks cleared",
+      duration: 2000,
+    });
+
+    const updatedTasks = tasks.filter((task) => !taskIds.includes(task.id ?? -1));
+    setTasks(updatedTasks);
+  }
+
+  async function refreshTasks() {
+    console.log("Refreshing tasks");
+    setAddEditTaskDialogOpen(false);
     // TODO - Add a loading state
-    setTasks(await getTasksByUserId(session?.user.id as string));
+    const updatedTasks = await getTasksByUserId(session?.user.id as string);
+    // sort tasks should not be setting state but just returning the sorted tasks
+    sortTasks(updatedTasks);
+    setTasks(updatedTasks);
   }
 
   function sortTasks(tasks: Task[]) {
-    return tasks.sort((a, b) => ((a.createdAt ?? new Date()) > (b.createdAt ?? new Date()) ? 1 : -1)).sort((a, b) => (a.completed ? 1 : -1));
+    const isAscending = sort.direction === "Ascending";
+
+    switch (sort.key) {
+      case "Title":
+        sortTasksByProperty(tasks, "title", isAscending);
+        break;
+      case "Date Created":
+        sortTasksByProperty(tasks, "createdAt", isAscending);
+        break;
+      case "Deadline":
+        sortTasksByProperty(tasks, "deadline", isAscending);
+        break;
+      default:
+        sortTasksByProperty(tasks, "createdAt", isAscending);
+    }
   }
 
-  const AddTaskDialog = () => {
+  // Figure out how to reuse this but maybe not, we just need to edit the task from the task component
+  const AddEditTaskDialog = ({ selectedTask }: { selectedTask: Task | undefined }) => {
     return (
-      <Dialog open={addTaskDialogOpen} onOpenChange={setAddTaskDialogOpen}>
+      <Dialog open={addEditTaskDialogOpen} onOpenChange={setAddEditTaskDialogOpen}>
         <DialogTrigger asChild>
-          <Button disabled={!session?.user?.id} variant="default">
+          <Button className="lg:scale-100 scale-90" disabled={!session?.user?.id} variant="default">
             Add Task
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add Task</DialogTitle>
-            <DialogDescription>Add a new task</DialogDescription>
+            <DialogTitle>{selectedTask ? "Add Task" : "Edit Task"}</DialogTitle>
           </DialogHeader>
-          <AddTaskForm onSubmitted={onAddTask} />
+          <AddTaskForm task={selectedTask} onSubmitted={refreshTasks} />
         </DialogContent>
       </Dialog>
     );
@@ -95,7 +136,7 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
       <div className="flex gap-4 flex-col items-left">
         <h1>No tasks yet!</h1>
         <div>
-          <AddTaskDialog />
+          <AddEditTaskDialog selectedTask={selectedTask} />
         </div>
       </div>
     );
@@ -103,51 +144,44 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
   // TODO - Try adding ability to drag tasks around to rearrange them
   // TODO - Add loading state
   return (
-    <div>
-      <div className="ml-4 flex items-left flex-col gap-2 pb-8">
-        {tasks.map((task) => (
-          <div key={task.id} className="border-b pb-2 flex gap-4">
-            <TaskCheckbox task={task} onToggle={onCheckChange} />
-            <Button
-              className={`hover:text-red-600 hover:bg-transparent hover:opacity-60 opacity-5`}
-              size="icon"
-              variant="ghost"
-              onClick={() => onDelete(task.id ?? -1)}
-            >
-              <Trash />
-            </Button>
-          </div>
-        ))}
+    <div className="flex flex-col gap-8">
+      <div className="flex justify-between">
+        <div className="flex gap-4">
+          <AddEditTaskDialog selectedTask={selectedTask} />
+        </div>
+        <div className="flex gap-8 lg:scale-100 scale-90">
+          <SortByDropdown setSort={setSort} sort={sort} />
+        </div>
       </div>
-      <AddTaskDialog />
+      <ScrollArea className="max-h-[520px] overflow-y-auto border border-gray-200 rounded-xl p-4">
+        <div className="ml-4 flex items-left flex-col gap-2 pb-8">
+          {/* TODO - Try alternating the bg color of tasks */}
+          {tasks.map((task) => (
+            <div key={task.id} className={`border-b pb-2 flex gap-8`}>
+              <TaskCheckbox
+                task={task}
+                onToggle={onCheckChange}
+                onEdit={() => {
+                  setSelectedTask(task);
+                  setAddEditTaskDialogOpen(true);
+                }}
+              />
+              <DeleteTaskAlert onDelete={() => onDelete(task.id ?? -1)} />
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+      <div className="flex w-full justify-between">
+        <Button className="flex self-start lg:scale-100 scale-90" variant="outline" onClick={onDeleteCompleted}>
+          Clear Completed
+        </Button>
+        <div className="flex items-center space-x-2 lg:scale-100 scale-90">
+          <Switch checked={isPrivate} disabled={true} id="private-tasks" />
+          <Label htmlFor="private-tasks">Private</Label>
+        </div>
+      </div>
     </div>
   );
-};
-
-const GetSampleTasks = () => {
-  const date = new Date(1996, 0, 1);
-  return [
-    {
-      id: 1,
-      title: "Welcome to tasks",
-      description: "",
-      userId: "",
-      completed: false,
-      createdAt: date,
-      updatedAt: date,
-      deadline: date,
-    },
-    {
-      id: 2,
-      title: "Please sign in to save and track tasks",
-      description: "Have a good day! 😊",
-      userId: "",
-      completed: false,
-      createdAt: date,
-      updatedAt: date,
-      deadline: date,
-    },
-  ];
 };
 
 export default TaskList;
