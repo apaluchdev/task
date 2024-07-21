@@ -92,6 +92,7 @@ const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
     // sort tasks should not be setting state but just returning the sorted tasks
     sortTasks(updatedTasks);
     setTasks(updatedTasks);
+    setSelectedTask(undefined);
   }
 
   function sortTasks(tasks: Task[]) {
