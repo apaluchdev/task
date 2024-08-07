@@ -1,13 +1,15 @@
-"use client";
-
 import React from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { SignOutButton } from "./sign-out-button";
+import { SignInButton } from "./sign-in-button";
 
-const NavBar: React.FC = () => {
-  const { data: session } = useSession();
+const NavBar: React.FC = async () => {
+  const session = await getServerSession(authOptions);
   var image = session?.user?.image;
 
   return (
@@ -16,26 +18,19 @@ const NavBar: React.FC = () => {
         Task
       </Link>
       <div>
-        {!session && (
-          <Button onClick={() => signIn()} className="mr-4 p-0 text-xl hover:text-slate-300 hover:bg-transparent bg-transparent">
-            Sign In
-          </Button>
-        )}
+        {!session && <SignInButton />}
 
         {session && (
           <div className="flex gap-4 justify-center items-center">
             {/* <h2 className="text-sm">{session.user.id}</h2> */}
             <h2 className="text-white tracking-tight">{session.user?.name}</h2>
             {image && <Image src={image} alt="user image" width={40} height={40} className="rounded-full" />}
-            <Button onClick={() => signOut()} className="mr-4 p-0 text-xl hover:text-slate-300 hover:bg-transparent bg-transparent">
-              Sign Out
-            </Button>
+            <SignOutButton />
           </div>
         )}
       </div>
     </nav>
   );
 };
-//  session?.user?.image
 
 export default NavBar;
