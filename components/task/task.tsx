@@ -65,7 +65,7 @@ const TaskCheckbox: React.FC<TaskCheckboxProps> = ({ task, onToggle, onEdit }) =
         <div className="text-sm flex flex-col text-slate-500 text-start min-w-72" suppressHydrationWarning>
           <p suppressHydrationWarning>Deadline: {task.deadline.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</p>
           <p suppressHydrationWarning className="font-bold text-black">
-            <span>Remaining: </span>
+            {!task.completed && <span>Remaining: </span>}
             {isOverdue && !task.completed && <p className="text-red-500 tracking-tight font-bold text-base">OVERDUE</p>}
             {!isOverdue && !task.completed && getTimeRemainingString({ days, hours, minutes })}
           </p>
