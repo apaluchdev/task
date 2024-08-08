@@ -4,11 +4,10 @@ import React, { useEffect, useState } from "react";
 import { deleteTask, deleteTasks, getTasksByUserId, updateTask } from "@/db/queries";
 import { toast } from "../ui/use-toast";
 import { Button } from "../ui/button";
-import { Pencil, Trash } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import AddTaskForm from "./add-task-form";
 import { useSession } from "next-auth/react";
-import { getSampleTasks, sortTasksByProperty, Task } from "@/types/task";
+import { sortTasksByProperty, Task } from "@/types/task";
 import TaskCheckbox from "./task";
 import { ScrollArea } from "../ui/scroll-area";
 import { SortByDropdown } from "./sort-by-dropdown";
@@ -19,14 +18,13 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface Props {
   tasksProp: Task[];
-  useSampleTasks: boolean;
 }
 
-const TaskList: React.FC<Props> = ({ tasksProp, useSampleTasks }) => {
+const TaskList: React.FC<Props> = ({ tasksProp }) => {
   const { data: session } = useSession();
 
   // If the user is not signed in, show sample tasks
-  const initialTasks = useSampleTasks ? getSampleTasks() : tasksProp;
+  const initialTasks = tasksProp;
 
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isPrivate, setIsPrivate] = useState(true);

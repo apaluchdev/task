@@ -1,6 +1,7 @@
 import TaskList from "@/components/task/task-list";
 import { getTasksByUserId } from "@/db/queries";
 import { authOptions } from "@/lib/auth";
+import { getSampleTasks } from "@/types/task";
 import { getServerSession } from "next-auth";
 
 export const dynamic = "force-dynamic";
@@ -16,8 +17,8 @@ export default async function Home() {
         </div>
         <div>
           {/* <h2 className="scroll-m-20 text-1xl font-bold tracking-tight lg:text-2xl pb-4 pt-4">Priority</h2> */}
-          {session?.user.id && <TaskList tasksProp={await getTasksByUserId(session?.user.id as string)} useSampleTasks={false} />}
-          {!session?.user.id && <TaskList tasksProp={[]} useSampleTasks={true} />}
+          {session?.user.id && <TaskList tasksProp={await getTasksByUserId(session?.user.id as string)} />}
+          {!session?.user.id && <TaskList tasksProp={session ? [] : getSampleTasks()} />}
         </div>
       </div>
     </main>

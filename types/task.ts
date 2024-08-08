@@ -28,28 +28,46 @@ export function sortTasksByProperty(tasks: Task[], property: keyof Task, ascendi
 
 export const getSampleTasks = () => {
   const date = new Date(1996, 0, 1);
-  return [
+  const tasks = [
     {
       id: 1,
       title: "Welcome to tasks",
-      description: "",
+      description: "Track your tasks with ease 🚀",
       userId: "",
       completed: false,
       createdAt: new Date(1996, 0, 1),
       updatedAt: date,
-      deadline: new Date(2008, 0, 1),
+      deadline: new Date(),
     },
     {
       id: 2,
+      title: "Created by Adrian Paluch",
+      description: "Motorsports enthusiast, gym rat, and software developer 🏎️🏋️‍♂️💻",
+      userId: "",
+      completed: false,
+      createdAt: new Date(1996, 0, 1),
+      updatedAt: date,
+      deadline: new Date(),
+    },
+    {
+      id: 3,
       title: "Please sign in to save and track tasks",
       description: "Have a good day! 😊",
       userId: "",
       completed: false,
       createdAt: new Date(2022, 0, 1),
       updatedAt: date,
-      deadline: new Date(2006, 0, 1),
+      deadline: new Date(),
     },
   ];
+
+  tasks.map((task) => {
+    task.deadline.setDate(task.deadline.getDate() + Math.floor(Math.random() * 10) + 1);
+    task.deadline.setHours(task.deadline.getHours() + Math.floor(Math.random() * 12) + 1);
+    task.deadline.setMinutes(task.deadline.getMinutes() + Math.floor(Math.random() * 60) + 1);
+  });
+
+  return tasks;
 };
 
 // Infer the Task type from the schema
