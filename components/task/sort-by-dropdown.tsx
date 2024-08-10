@@ -16,6 +16,11 @@ interface Props {
 }
 
 export const SortByDropdown: React.FC<Props> = ({ sort, setSort }) => {
+  function onSortChange(direction: string) {
+    localStorage.setItem("sortPreference", direction);
+    setSort((curr) => ({ key: curr.key, direction: direction as "Ascending" | "Descending" }));
+  }
+
   function SortKeyDropdown() {
     return (
       <DropdownMenu>
@@ -41,10 +46,7 @@ export const SortByDropdown: React.FC<Props> = ({ sort, setSort }) => {
 
   function DirectionRadioGroup() {
     return (
-      <RadioGroup
-        onValueChange={(direction: string) => setSort((curr) => ({ key: curr.key, direction: direction === "Ascending" ? "Ascending" : "Descending" }))}
-        defaultValue={sort.direction}
-      >
+      <RadioGroup onValueChange={(dir: string) => onSortChange(dir)} defaultValue={sort.direction}>
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="Ascending" id="r1" />
           <Label htmlFor="r1">Ascending</Label>

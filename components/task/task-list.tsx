@@ -29,13 +29,20 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isPrivate, setIsPrivate] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
-  const [sort, setSort] = useState<{ key: string; direction: "Ascending" | "Descending" }>({ key: "Date Created", direction: "Ascending" });
+  const [sort, setSort] = useState<{ key: string; direction: "Ascending" | "Descending" }>({
+    key: "Date Created",
+    direction: "Descending",
+  });
   const [addEditTaskDialogOpen, setAddEditTaskDialogOpen] = React.useState(false);
 
   useEffect(() => {
     sortTasks(tasks);
     setTasks([...tasks]);
   }, [sort]);
+
+  useEffect(() => {
+    setSort((curr) => ({ key: curr.key, direction: (localStorage.getItem("sortPreference") as "Ascending" | "Descending") || curr.direction }));
+  }, []);
 
   async function onCheckChange(id: number) {
     let task = tasks.find((task) => task.id === id);
