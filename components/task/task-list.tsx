@@ -153,7 +153,7 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
   // TODO - Add loading state
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex justify-between">
+      <div className="flex justify-between flex-wrap gap-2">
         <div className="flex gap-4">
           <AddEditTaskDialog selectedTask={selectedTask} />
         </div>

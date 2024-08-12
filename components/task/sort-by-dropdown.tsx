@@ -25,7 +25,7 @@ export const SortByDropdown: React.FC<Props> = ({ sort, setSort }) => {
     return (
       <DropdownMenu>
         <div className="flex items-center gap-2">
-          <p className="text-muted-foreground text-base">Sort By:</p>
+          <p className="text-muted-foreground text-base">Sort By</p>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">{sort.key}</Button>
           </DropdownMenuTrigger>
@@ -60,9 +60,8 @@ export const SortByDropdown: React.FC<Props> = ({ sort, setSort }) => {
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 flex-wrap ">
       <SortKeyDropdown />
-      <Separator orientation="vertical" />
       <DirectionRadioGroup />
     </div>
   );
