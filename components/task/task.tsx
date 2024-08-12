@@ -7,6 +7,7 @@ import { Task } from "@/types/task";
 import { Button } from "../ui/button";
 import { Pencil } from "lucide-react";
 import { getRemainingTime } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface TaskCheckboxProps {
   task: Task;
@@ -15,11 +16,7 @@ interface TaskCheckboxProps {
 }
 
 function getTimeRemainingString({ days, hours, minutes }: { days: number; hours: number; minutes: number }): string {
-  const dayStr = days > 1 ? "days" : "day";
-  const hourStr = hours > 1 ? "hours" : "hour";
-  const minuteStr = minutes > 1 ? "minutes" : "minute";
-
-  return `${days} ${dayStr}, ${hours} ${hourStr}, ${minutes} ${minuteStr}`;
+  return `${days.toString().padStart(2, "0")}:${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }
 
 // An individual task component
@@ -62,13 +59,20 @@ const TaskCheckbox: React.FC<TaskCheckboxProps> = ({ task, onToggle, onEdit }) =
       </div>
 
       {task.deadline && (
-        <div className="text-sm flex flex-col text-slate-500 text-start min-w-72" suppressHydrationWarning>
-          <p suppressHydrationWarning>Deadline: {task.deadline.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</p>
+        <div className="flex flex-col text-slate-500 text-end min-w-24" suppressHydrationWarning>
           <p suppressHydrationWarning className="font-bold text-black">
-            {!task.completed && <span>Remaining: </span>}
             {isOverdue && !task.completed && <p className="text-red-500 tracking-tight font-bold text-base">OVERDUE</p>}
-            {!isOverdue && !task.completed && getTimeRemainingString({ days, hours, minutes })}
           </p>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p>{!isOverdue && !task.completed && getTimeRemainingString({ days, hours, minutes })}</p>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p suppressHydrationWarning>Deadline: {task.deadline.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <p className="hidden">{tick}</p>
         </div>
       )}
