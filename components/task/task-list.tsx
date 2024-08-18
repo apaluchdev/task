@@ -58,8 +58,9 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
 
     task.completed = !task.completed;
 
-    sortTasks(tasks);
     setTasks([...tasks]);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    sortTasks(tasks);
 
     if (!task.id) return;
 

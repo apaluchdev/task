@@ -48,7 +48,7 @@ const TaskCheckbox: React.FC<TaskCheckboxProps> = ({ task, onToggle, onEdit }) =
   return (
     <div className={`flex items-center justify-between tracking-tight w-full ${task.completed ? "text-gray-500 opacity-50" : ""}`} key={task.id}>
       <div className="flex items-center gap-4 ">
-        <Checkbox checked={task.completed} onCheckedChange={() => onToggle(task.id ?? -1)} className="scale-125 hover:bg-slate-100" id={task.id + ""} />
+        <Checkbox checked={task.completed} onCheckedChange={() => onToggle(task.id ?? -1)} className="transition-colors duration-500 scale-125 hover:bg-slate-100 " id={task.id + ""} />
         <Label className={` text-base lg:text-xl tracking-tight hover:cursor-pointer`} htmlFor={task.id + ""}>
           <div className="flex flex-col">
             <h1>{task.title}</h1>
