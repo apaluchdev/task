@@ -58,13 +58,19 @@ const TaskList: React.FC<Props> = ({ tasksProp }) => {
 
     task.completed = !task.completed;
 
+    // Set the tasks immediately to show the updated checkbox
     setTasks([...tasks]);
+    await updateTask(task.id, { ...task, completed: task.completed });
+
+    // TODO - Ensure a total time of database request and time for next render to be 1 second for good UI experience
+    // Don't want the checkbox to immediately disappear due to the sort once checked. Results in better "checking" feedback to user.
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Now sort and render again
     sortTasks(tasks);
+    setTasks([...tasks]);
 
     if (!task.id) return;
-
-    await updateTask(task.id, { ...task, completed: task.completed });
   }
 
   async function onDelete(taskId: number) {
